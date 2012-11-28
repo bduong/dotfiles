@@ -29,4 +29,3 @@ color brightcyan "\<(export)\>"
 color yellow "\<(shopt)\>"
 color brightred "\<(umask)\>.*$"
 color brightcyan  "#.*$"
-
