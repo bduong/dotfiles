@@ -28,7 +28,7 @@ function rebase-remote() {
         git rebase origin/master
 }
 
-function git-up() {
+function gitup() {
         echo_bold "Fetching..............................."
         git fetch --all
         echo_bold "Rebasing..............................."
