@@ -64,10 +64,10 @@ $MAVEN_HOME/bin/mvn $* | sed -e "s/Tests run: \([^,]*\), Failures: \([^,]*\), Er
 function color_git_log() {
  git log --stat $* |sed \
 -e "s_\(commit\)\ \([0-9a-z]*\)_$(echo_color $YELLOW '\1')\ $(echo_color $YELLOW '\2')_g" \
--e "s_\(Author\):\ \([a-zA-Z0-9\. -]*\)\ <\([a-zA-Z0-9\.]*\)@\([a-zA-Z]*\)\.\([a-zA-z]*\)>_$(echo_color $BLUE '\1')\ $(echo_color $WHITE '\2')\ <$(echo_color $CYAN '\3')@$(echo_color $BLUE '\4')\.$(echo_color $BLACK '\5')>_g" \
+-e "s_\(Author\):\ \([a-zA-Z0-9\. -]*\)\ <\([a-zA-Z0-9\.]*\)@\([a-zA-Z0-9\.-]*\)\.\([()a-zA-z]*\)>_$(echo_color $BLUE '\1')\ $(echo_color $WHITE '\2')\ <$(echo_color $CYAN '\3')@$(echo_color $BLUE '\4')\.$(echo_color $BLACK '\5')>_g" \
 -e "s_\(Date:\)\(.*\)_$(echo_color $MAGENTA '\1')$(echo_color $BLACK '\2')_g" \
 -e "s_\([0-9]*\ files\ changed\),\ \([0-9]*\ insertions(+)\),\ \([0-9]* deletions(-)\)_$(echo_color $BLUE '\1'),\ $(echo_color $GREEN '\2'),\ $(echo_color $RED '\3')_g" \
--e "s_\([\./a-zA-Z0-9]*\)\([ ]*\)|\([ ]*\)\([0-9]*\)\ \([+]*\)\([-]*\)_$(echo_color $BLUE '\1')\2|\3$(echo_color $WHITE '\4')\ $(echo_color $GREEN '\5')$(echo_color $RED '\6')_g" \
+-e "s_\([-_\./a-zA-Z0-9]*\)\([ ]*\)|\([ ]*\)\([0-9]*\)\ \([+]*\)\([-]*\)_$(echo_color $BLUE '\1')\2|\3$(echo_color $WHITE '\4')\ $(echo_color $GREEN '\5')$(echo_color $RED '\6')_g" \
 |more -R 
 
 #-e "s_\(Author\):\ \([0-9a-zA-Z\.-]*\)\ <\([0-9a-zA-Z\.-]*\)@\([a-zA-Z]*\)\.\([a-zA-Z]*\)_hello_g"\
