@@ -1,6 +1,21 @@
+BLACK="\e[1;30m"
+RED="\e[1;31m"
+GREEN="\e[1;32m"
+YELLOW="\e[1;33m"
+BLUE="\e[1;34m"
+MAGENTA="\e[1;35m"
+CYAN="\e[1;36m"
+WHITE="\e[1;37m"
+END="\e[0m"
+
 echo_bold () {
   message=${1}
   echo -e "\033[1m${message}\033[0m"
+}
+echo_color() {
+  color=${1}
+  message=${2}
+  echo -e "${color}${message}$END"  
 }
 
 function gpush() {
@@ -38,12 +53,27 @@ function gitup() {
 }
 
 
-color_maven() {
-mvn $* | sed -e "s/Tests run: \([^,]*\), Failures: \([^,]*\), Errors: \([^,]*\), Skipped: \([^,]*\)/$(echo -e '\e[1;97m')Tests run: \1$(echo -e '\e[0m'), $(echo -e '\e[1;91m')Failures: \2$(echo -e '\e[0m'), $(echo -e '\e[1;93m')Errors: \3$(echo -e '\e[0m'), $(echo -e '\e[1;94m')Skipped: \4$(echo -e '\e[0m')/g" \
+function color_maven() {
+$MAVEN_HOME/bin/mvn $* | sed -e "s/Tests run: \([^,]*\), Failures: \([^,]*\), Errors: \([^,]*\), Skipped: \([^,]*\)/$(echo -e '\e[1;97m')Tests run: \1$(echo -e '\e[0m'), $(echo -e '\e[1;91m')Failures: \2$(echo -e '\e[0m'), $(echo -e '\e[1;93m')Errors: \3$(echo -e '\e[0m'), $(echo -e '\e[1;94m')Skipped: \4$(echo -e '\e[0m')/g" \
     -e "s_\(\[WARN\].*\)_$(echo -e '\e[1;33m')\1$(echo -e '\e[0m')_g" \
     -e "s_\(\[WARNING\].*\)_$(echo -e '\e[1;33m')\1$(echo -e '\e[0m')_g" \
     -e "s_\(\[INFO\].*\)_$(echo -e '\e[1;34m')\1$(echo -e '\e[0m')_g" \
     -e "s_\(\[ERROR\].*\)_$(echo -e '\e[1;31m')\1$(echo -e '\e[0m')_g"
 }
+
+function color_git_log() {
+ git log --stat $* |sed \
+-e "s_\(commit\)\ \([0-9a-z]*\)_$(echo_color $YELLOW '\1')\ $(echo_color $YELLOW '\2')_g" \
+-e "s_\(Author\):\ \([a-zA-Z0-9\. -]*\)\ <\([a-zA-Z0-9\.]*\)@\([a-zA-Z]*\)\.\([a-zA-z]*\)>_$(echo_color $BLUE '\1')\ $(echo_color $WHITE '\2')\ <$(echo_color $CYAN '\3')@$(echo_color $BLUE '\4')\.$(echo_color $BLACK '\5')>_g" \
+-e "s_\(Date:\)\(.*\)_$(echo_color $MAGENTA '\1')$(echo_color $BLACK '\2')_g" \
+-e "s_\([0-9]*\ files\ changed\),\ \([0-9]*\ insertions(+)\),\ \([0-9]* deletions(-)\)_$(echo_color $BLUE '\1'),\ $(echo_color $GREEN '\2'),\ $(echo_color $RED '\3')_g" \
+-e "s_\([\./a-zA-Z0-9]*\)\([ ]*\)|\([ ]*\)\([0-9]*\)\ \([+]*\)\([-]*\)_$(echo_color $BLUE '\1')\2|\3$(echo_color $WHITE '\4')\ $(echo_color $GREEN '\5')$(echo_color $RED '\6')_g" \
+|more -R 
+
+#-e "s_\(Author\):\ \([0-9a-zA-Z\.-]*\)\ <\([0-9a-zA-Z\.-]*\)@\([a-zA-Z]*\)\.\([a-zA-Z]*\)_hello_g"\
+#-e "s_\(commit\ [0-9a-z]*\)_$(echo $YELLOW)\1$(echo $END)_g" \
+
+}
+
 
 
