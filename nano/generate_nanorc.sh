@@ -14,6 +14,7 @@ rcs=(
     "fortran"
     "gentoo"
     "groff"
+    "groovy"
     "haml"
     "html"
     "java"
