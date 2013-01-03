@@ -13,6 +13,7 @@ rcs=(
 #   "cython"
     "fortran"
     "gentoo"
+    "git"
     "groff"
     "groovy"
     "haml"

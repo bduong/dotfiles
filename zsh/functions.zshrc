@@ -74,4 +74,7 @@ function color_git_log() {
 }
 
 
+function delete-behind() {
+ git branch -vvv |grep behind |grep -v ahead | awk '{print $1}'| while read line; do; git branch -d $line; done
+}
 

@@ -1,0 +1,6 @@
+syntax "git" "COMMIT_EDITMSG"
+color cyan "#.*"
+color yellow "Testing Done:.*"
+color red "Bug Number:.*"
+color white "Reviewed by:.*"
+color white "Review URL:.*"
