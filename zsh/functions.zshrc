@@ -63,18 +63,41 @@ $MAVEN_HOME/bin/mvn $* | sed -e "s/Tests run: \([^,]*\), Failures: \([^,]*\), Er
     -e "s_\(\[ERROR\].*\)_$(echo -e '\e[1;31m')\1$(echo -e '\e[0m')_g"
 }
 
-function color_git_log() {
- git log --stat $* |sed \
+function color_git_original() {
+ git log --stat --pretty=fuller $* |sed \
 -e "s_\(commit\)\ \([0-9a-z]*\)_$(echo_color $YELLOW '\1')\ $(echo_color $YELLOW '\2')_g" \
--e "s_\(Author\):\ \([a-zA-Z0-9\. -]*\)\ <\([a-zA-Z0-9\.]*\)@\([a-zA-Z0-9\.-]*\)\.\([()a-zA-Z]*\)>_$(echo_color $BLUE '\1')\ $(echo_color $WHITE '\2')\ <$(echo_color $CYAN '\3')@$(echo_color $BLUE '\4')\.$(echo_color $PINK '\5')>_g" \
--e "s_\(Date:\)\(.*\)_$(echo_color $MAGENTA '\1')$(echo_color $GREY '\2')_g" \
+-e "s_\(Author\):\ \([a-zA-Z0-9\. -]*\)\ <\([a-zA-Z0-9\.]*\)@\([a-zA-Z0-9\.-]*\)\.\([()a-zA-Z]*\)>_$(echo_color $BLUE '\1':)\ $(echo_color $WHITE '\2')\ <$(echo_color $CYAN '\3')@$(echo_color $BLUE '\4')\.$(echo_color $PINK '\5')>_g" \
+-e "s_\(Commit\):\ \ \ \([a-zA-Z0-9\. -]*\)\ <\([a-zA-Z0-9\.]*\)@\([a-zA-Z0-9\.-]*\)\.\([()a-zA-Z]*\)>_$(echo_color $BLUE '\1'er:)\ $(echo_color $WHITE '\2')\ <$(echo_color $CYAN '\3')@$(echo_color $BLUE '\4')\.$(echo_color $PINK '\5')>_g" \
+-e "s_\(^.*\)Date:\(.*\)_$(echo_color $MAGENTA '\1'\ Date:)$(echo_color $GREY '\2')_g" \
 -e "s_\([0-9]*\ files\ changed\),\ \([0-9]*\ insertions(+)\),\ \([0-9]* deletions(-)\)_$(echo_color $BLUE '\1'),\ $(echo_color $GREEN '\2'),\ $(echo_color $RED '\3')_g" \
 -e "s_\([-_\./a-zA-Z0-9]*\)\([ ]*\)|\([ ]*\)\([0-9]*\)\ \([+]*\)\([-]*\)_$(echo_color $BLUE '\1')\2|\3$(echo_color $WHITE '\4')\ $(echo_color $GREEN '\5')$(echo_color $RED '\6')_g" \
+-e "s_\(Testing Done:\)\(.*\)_$(echo_color $YELLOW '\1')$(echo_color $YELLOW '\2')_g" \
+-e "s_\(Bug Number:\)\(.*\)_$(echo_color $RED '\1')$(echo_color $RED '\2')_g" \
+-e "s_\(Reviewed by:\)\(.*\)_$(echo_color $WHITE '\1')$(echo_color $WHITE '\2')_g" \
+-e "s_\(Review URL:\)\(.*\)_$(echo_color $WHITE '\1')$(echo_color $WHITE '\2')_g" \
+|less -X -r
+}
+
+function color_git_log() {
+ git log --stat --pretty=fuller $* |awk '/^Commit:.*$/ {printf("%s ", $0); next} 1' | awk '/^Author:.*$/ {printf("%s ", $0); next} 1' \
+ | sed \
+-e "s_\(commit\)\ \([0-9a-z]*\)_$(echo_color $YELLOW '\1')\ $(echo_color $YELLOW '\2')_g" \
+-e "s_\(Author\):\ \([a-zA-Z0-9\. -]*\)\ <\([a-zA-Z0-9\.]*\)@\([a-zA-Z0-9\.-]*\)\.\([()a-zA-Z]*\)>[ ]*\(.*\)Date:\(.*\)_$(echo_color $BLUE '\1':)\ $(echo_color $WHITE '\2')\ <$(echo_color $CYAN '\3')@$(echo_color $BLUE '\4')\.$(echo_color $PINK '\5')>	$(echo_color $MAGENTA '\6'\ Date:)$(echo_color $GREY '\7')_g" \
+-e "s_\(Commit\):\ \ \ \([a-zA-Z0-9\. -]*\)\ <\([a-zA-Z0-9\.]*\)@\([a-zA-Z0-9\.-]*\)\.\([()a-zA-Z]*\)>[ ]*\(.*\)Date:\(.*\)_$(echo_color $BLUE '\1'er:)\ $(echo_color $WHITE '\2')\ <$(echo_color $CYAN '\3')@$(echo_color $BLUE '\4')\.$(echo_color $PINK '\5')>	$(echo_color $MAGENTA '\6'\ Date:)$(echo_color $GREY '\7')_g" \
+-e "s_\([0-9]*\ files\ changed\),\ \([0-9]*\ insertions(+)\),\ \([0-9]* deletions(-)\)_$(echo_color $BLUE '\1'),\ $(echo_color $GREEN '\2'),\ $(echo_color $RED '\3')_g" \
+-e "s_\([-_\./a-zA-Z0-9]*\)\([ ]*\)|\([ ]*\)\([0-9]*\)\ \([+]*\)\([-]*\)_$(echo_color $BLUE '\1')\2|\3$(echo_color $WHITE '\4')\ $(echo_color $GREEN '\5')$(echo_color $RED '\6')_g" \
+-e "s_\(Testing Done:\)\(.*\)_$(echo_color $YELLOW '\1')$(echo_color $YELLOW '\2')_g" \
+-e "s_\(Bug Number:\)\(.*\)_$(echo_color $RED '\1')$(echo_color $RED '\2')_g" \
+-e "s_\(Reviewed by:\)\(.*\)_$(echo_color $WHITE '\1')$(echo_color $WHITE '\2')_g" \
+-e "s_\(Review URL:\)\(.*\)_$(echo_color $WHITE '\1')$(echo_color $WHITE '\2')_g" \
 |less -X -r
 }
 
 
 function delete-behind() {
- git branch -vvv |grep behind |grep -v ahead | awk '{print $1}'| while read line; do; git branch -d $line; done
+ git branch -vvv |grep behind |grep -v ahead | grep -v release | awk '{print $1}' |grep -v develop |grep -v master | grep -v release |grep -v '*'| while read line; do; git branch -d $line; done
 }
 
+function delete-behind-all() {
+ git branch -vvv | grep -v release | awk '{print $1}' |grep -v develop |grep -v master | grep -v release |grep -v '*' | while read line; do; git branch -D $line; done
+}
