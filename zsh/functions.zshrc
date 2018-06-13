@@ -95,9 +95,23 @@ function color_git_log() {
 
 
 function delete-behind() {
- git branch -vvv |grep behind |grep -v ahead | grep -v release | awk '{print $1}' |grep -v develop |grep -v master | grep -v release |grep -v '*'| while read line; do; git branch -d $line; done
+ git branch -vvv |grep behind |grep -v ahead | awk '{print $1}' |grep -v sp-main |grep -v '*'| while read line; do; git branch -d $line; done
 }
 
 function delete-behind-all() {
  git branch -vvv | grep -v release | awk '{print $1}' |grep -v develop |grep -v master | grep -v release |grep -v '*' | while read line; do; git branch -D $line; done
+}
+
+fix-move () 
+{ 
+    if [ $# -ne 3 ]; then
+        echo "Usage: $FUNCNAME old new cl";
+        return 65;
+    fi;
+    p4 revert $1;
+    p4 open $1;
+    cp $2 $1;
+    p4 revert $2;
+    rm $2;
+    p4 move -c $3 $1 $2
 }
