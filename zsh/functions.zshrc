@@ -79,9 +79,9 @@ function color_git_original() {
 }
 
 function color_git_log() {
- git log --stat --pretty=fuller $* |awk '/^Commit:.*$/ {printf("%s ", $0); next} 1' | awk '/^Author:.*$/ {printf("%s ", $0); next} 1' \
+ git log --stat --pretty=fuller --decorate $* |awk '/^Commit:.*$/ {printf("%s ", $0); next} 1' | awk '/^Author:.*$/ {printf("%s ", $0); next} 1' \
  | sed \
--e "s_\(commit\)\ \([0-9a-z]*\)_$(echo_color $YELLOW '\1')\ $(echo_color $YELLOW '\2')_g" \
+-e "s_\(commit\)\ \([0-9a-z]*\)\( (.*)\)\{0,1\}_$(echo_color $YELLOW '\1')\ $(echo_color $YELLOW '\2')  $(echo_color $CYAN '\3')_g" \
 -e "s_\(Author\):\ \([a-zA-Z0-9\. -]*\)\ <\([a-zA-Z0-9\.]*\)@\([a-zA-Z0-9\.-]*\)\.\([()a-zA-Z]*\)>[ ]*\(.*\)Date:\(.*\)_$(echo_color $BLUE '\1':)\ $(echo_color $WHITE '\2')\ <$(echo_color $CYAN '\3')@$(echo_color $BLUE '\4')\.$(echo_color $PINK '\5')>	$(echo_color $MAGENTA '\6'\ Date:)$(echo_color $GREY '\7')_g" \
 -e "s_\(Commit\):\ \ \ \([a-zA-Z0-9\. -]*\)\ <\([a-zA-Z0-9\.]*\)@\([a-zA-Z0-9\.-]*\)\.\([()a-zA-Z]*\)>[ ]*\(.*\)Date:\(.*\)_$(echo_color $BLUE '\1'er:)\ $(echo_color $WHITE '\2')\ <$(echo_color $CYAN '\3')@$(echo_color $BLUE '\4')\.$(echo_color $PINK '\5')>	$(echo_color $MAGENTA '\6'\ Date:)$(echo_color $GREY '\7')_g" \
 -e "s_\([0-9]*\ files\ changed\),\ \([0-9]*\ insertions(+)\),\ \([0-9]* deletions(-)\)_$(echo_color $BLUE '\1'),\ $(echo_color $GREEN '\2'),\ $(echo_color $RED '\3')_g" \
