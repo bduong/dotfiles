@@ -79,11 +79,11 @@ function color_git_original() {
 }
 
 function color_git_log() {
- git log --stat --pretty=fuller --decorate $* |awk '/^Commit:.*$/ {printf("%s ", $0); next} 1' | awk '/^Author:.*$/ {printf("%s ", $0); next} 1' \
+ git log --stat=150 --pretty=fuller --decorate $* |awk '/^Commit:.*$/ {printf("%s ", $0); next} 1' | awk '/^Author:.*$/ {printf("%s ", $0); next} 1' \
  | sed \
 -e "s_\(commit\)\ \([0-9a-z]*\)\( (.*)\)\{0,1\}_$(echo_color $YELLOW '\1')\ $(echo_color $YELLOW '\2')  $(echo_color $CYAN '\3')_g" \
 -e "s_\(Author\):\ \([a-zA-Z0-9\. -]*\)\ <\([a-zA-Z0-9\.]*\)@\([a-zA-Z0-9\.-]*\)\.\([()a-zA-Z]*\)>[ ]*\(.*\)Date:\(.*\)_$(echo_color $BLUE '\1':)\ $(echo_color $WHITE '\2')\ <$(echo_color $CYAN '\3')@$(echo_color $BLUE '\4')\.$(echo_color $PINK '\5')>	$(echo_color $MAGENTA '\6'\ Date:)$(echo_color $GREY '\7')_g" \
--e "s_\(Commit\):\ \ \ \([a-zA-Z0-9\. -]*\)\ <\([a-zA-Z0-9\.]*\)@\([a-zA-Z0-9\.-]*\)\.\([()a-zA-Z]*\)>[ ]*\(.*\)Date:\(.*\)_$(echo_color $BLUE '\1'er:)\ $(echo_color $WHITE '\2')\ <$(echo_color $CYAN '\3')@$(echo_color $BLUE '\4')\.$(echo_color $PINK '\5')>	$(echo_color $MAGENTA '\6'\ Date:)$(echo_color $GREY '\7')_g" \
+-e "s_\(Commit\):\ \ \ \([a-zA-Z0-9\. -]*\)\ <\([a-zA-Z0-9\.-]*\)@\([a-zA-Z0-9\.-]*\)\.\([()a-zA-Z]*\)>[ ]*\(.*\)Date:\(.*\)_$(echo_color $BLUE '\1'er:)\ $(echo_color $WHITE '\2')\ <$(echo_color $CYAN '\3')@$(echo_color $BLUE '\4')\.$(echo_color $PINK '\5')>	$(echo_color $MAGENTA '\6'\ Date:)$(echo_color $GREY '\7')_g" \
 -e "s_\([0-9]*\ files\ changed\),\ \([0-9]*\ insertions(+)\),\ \([0-9]* deletions(-)\)_$(echo_color $BLUE '\1'),\ $(echo_color $GREEN '\2'),\ $(echo_color $RED '\3')_g" \
 -e "s_\([-_\./a-zA-Z0-9]*\)\([ ]*\)|\([ ]*\)\([0-9]*\)\ \([+]*\)\([-]*\)_$(echo_color $BLUE '\1')\2|\3$(echo_color $WHITE '\4')\ $(echo_color $GREEN '\5')$(echo_color $RED '\6')_g" \
 -e "s_\(Testing Done:\)\(.*\)_$(echo_color $YELLOW '\1')$(echo_color $YELLOW '\2')_g" \
@@ -96,6 +96,10 @@ function color_git_log() {
 
 function delete-behind() {
  git branch -vvv |grep behind |grep -v ahead | awk '{print $1}' |grep -v sp-main |grep -v '*'| while read line; do; git branch -d $line; done
+}
+
+function delete-merged() {
+ git branch -vvv |grep sp-main |grep -v ahead | awk '{print $1}' |grep -v sp-main |grep -v '*'| while read line; do; git branch -d $line; done
 }
 
 function delete-behind-all() {
@@ -114,4 +118,19 @@ fix-move ()
     p4 revert $2;
     rm $2;
     p4 move -c $3 $1 $2
+}
+
+function cleanup-branches() {
+ COUNTER=0
+ git branch -vv --sort=-committerdate | awk '{print $1}' | while read line 
+	do
+	if [ $COUNTER -gt $1 ]; then
+		if [ $# -eq 2 ]; then 
+			echo $line
+		else
+			git branch -D $line
+		fi
+	fi
+	COUNTER=$((COUNTER + 1)); 
+	done
 }
